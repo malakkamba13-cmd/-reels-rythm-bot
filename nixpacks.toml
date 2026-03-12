@@ -1,0 +1,10 @@
+providers = ["python"]
+
+[phases.setup]
+nixPkgs = ["ffmpeg"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt", "pip install yt-dlp"]
+
+[start]
+cmd = "python bot.py"

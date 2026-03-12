@@ -1,0 +1,12 @@
+.env
+downloads/
+*.mp3
+*.mp4
+*.m4a
+*.webm
+vip_users.json
+tron_wallets.json
+admin_config.json
+__pycache__/
+*.pyc
+welcome.mp3
