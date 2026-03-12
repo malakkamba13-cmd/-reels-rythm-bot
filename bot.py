@@ -19,9 +19,9 @@ keep_alive.keep_alive()
 load_dotenv()
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
+import sys
 # Dynamic yt-dlp path
-YT_DLP_PATH = "yt-dlp"
-
+YT_DLP_PATH = sys.executable
 
 # VIP Persistence
 VIP_FILE = "vip_users.json"
@@ -220,6 +220,11 @@ async def run_browse(message, category):
     }
     search_q = search_map.get(category, "trending")
     results = search_content(search_q, limit=5)
+    
+    if not results:
+        await message.reply_text("❌ No results found or search failed. Please try again later.")
+        return
+        
     for res in results:
         await send_result(message, res)
 
@@ -453,10 +458,10 @@ async def download_async(video_id, output_path, mode, fast_preview=False, progre
             else:
                 # VIP preference for 720p if small enough, otherwise fallback to 480p
                 quality = f"best[height<=720][filesize<{q_limit}]/best[height<=480][filesize<{q_limit}]/best[height<=480]"
-            cmd = [YT_DLP_PATH] + flags + ["-f", quality, "-o", f"{base}.%(ext)s", url]
+            cmd = [YT_DLP_PATH, "-m", "yt_dlp"] + flags + ["-f", quality, "-o", f"{base}.%(ext)s", url]
         else:
             # Audio optimization: Prefer m4a (aac) for speed as it usually needs no conversion
-            cmd = [YT_DLP_PATH] + flags + ["-f", "bestaudio[ext=m4a]/bestaudio/best", "-o", f"{base}.%(ext)s", url]
+            cmd = [YT_DLP_PATH, "-m", "yt_dlp"] + flags + ["-f", "bestaudio[ext=m4a]/bestaudio/best", "-o", f"{base}.%(ext)s", url]
             
         process = await asyncio.create_subprocess_exec(
             *cmd,
@@ -502,9 +507,9 @@ def search_content(query, limit=5):
     try:
         # If it's an 11-char video ID, fetch it directly; otherwise use ytsearch
         if len(query) == 11 and all(c.isalnum() or c in '-_' for c in query):
-            cmd = [YT_DLP_PATH, "--dump-json", "--flat-playlist", query]
+            cmd = [YT_DLP_PATH, "-m", "yt_dlp", "--dump-json", "--flat-playlist", query]
         else:
-            cmd = [YT_DLP_PATH, "--dump-json", "--flat-playlist", f"ytsearch{limit}:{query}"]
+            cmd = [YT_DLP_PATH, "-m", "yt_dlp", "--dump-json", "--flat-playlist", f"ytsearch{limit}:{query}"]
         output = subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode()
         
         results = []
