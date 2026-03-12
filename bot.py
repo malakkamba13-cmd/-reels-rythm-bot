@@ -20,7 +20,8 @@ load_dotenv()
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 # Dynamic yt-dlp path
-YT_DLP_PATH = shutil.which("yt-dlp") or r"C:\Users\Malak\AppData\Local\Python\pythoncore-3.14-64\Scripts\yt-dlp.exe"
+YT_DLP_PATH = "yt-dlp"
+
 
 # VIP Persistence
 VIP_FILE = "vip_users.json"
